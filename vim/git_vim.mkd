@@ -1,0 +1,17 @@
+# Git for Vim
+
+## Commit Message Syntax Highlighting
+
+Check that you have a git commit syntax file: `gitcommit.vim`
+
+Mine was in `/usr/share/vim/vim73/syntax/gitcommit.vim`.
+
+Use that as a base for your customization, but don't edit it directly.
+
+Place the customizations in your `~/.vim/after/syntax/gitcommit.vim` file. _Create one, if necessary._
+
+Mine are in this folder.
+
+## Git Inside Your Vim
+
+[vim-figitive](https://github.com/tpope/vim-fugitive)
