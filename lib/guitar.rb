@@ -1,5 +1,7 @@
 class Guitar
 
+  STANDARD_TUNING = [ 'E', 'A', 'D', 'G', 'B', 'e']
+
   def downstrum
     strings.each do |string|
       puts string
@@ -12,7 +14,11 @@ class Guitar
     end
   end
 
+  def pick_strings(string_array)
+    string_array.map{|s| puts s}
+  end
+
   def strings
-    @strings ||= [ 'E', 'A', 'D', 'G', 'B', 'e']
+    @strings ||= STANDARD_TUNING
   end
 end
