@@ -1,14 +1,18 @@
 class Guitar
 
   def downstrum
-    [ 'E', 'A', 'D', 'G', 'B', 'e'].each do |string|
+    strings.each do |string|
       puts string
     end
   end
 
   def upstrum
-    [ 'e', 'B', 'G', 'D', 'A', 'E'].each do |string|
+    strings.each do |string|
       puts string
     end
+  end
+
+  def strings
+    @strings ||= [ 'E', 'A', 'D', 'G', 'B', 'e']
   end
 end
