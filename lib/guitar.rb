@@ -9,9 +9,7 @@ class Guitar
   end
 
   def upstrum
-    strings.each do |string|
-      puts string
-    end
+    pick_strings strings.reverse
   end
 
   def pick_strings(string_array)
