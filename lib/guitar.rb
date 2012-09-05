@@ -5,4 +5,10 @@ class Guitar
       puts string
     end
   end
+
+  def upstrum
+    [ 'e', 'B', 'G', 'D', 'A', 'E'].each do |string|
+      puts string
+    end
+  end
 end
