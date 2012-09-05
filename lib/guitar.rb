@@ -3,9 +3,7 @@ class Guitar
   STANDARD_TUNING = [ 'E', 'A', 'D', 'G', 'B', 'e']
 
   def downstrum
-    strings.each do |string|
-      puts string
-    end
+    pick_strings strings
   end
 
   def upstrum
