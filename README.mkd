@@ -1,6 +1,6 @@
 # Gitar - Git Workflow Lunch&Learn
 
-A 30-45 minute talk on daily Git workflow strategies and concepts.
+A 30-45-75-90-120 minute talk on daily Git workflow strategies and concepts.
 Topics covered will be committing, branching, merging, rebasing,
 pull requests, some nifty tricks, and git internals. A fully interactive
 "Hers's a terminal. Let's type stuff." approach will be used as opposed to a
@@ -30,7 +30,7 @@ questions or topics you'd like to be covered.
 * singly linked list
 * commits have a link to their parent
 * commits are simply hashes of their content
-  * including the parent and message(?)
+  * including the parent and message
 * links can be manipulated at will through tools like rebase
 
 ## Branching
@@ -99,6 +99,7 @@ commit
 > Get your code into master sanely
 
 New Feature workflow
+
 1. Get the latest master
 2. Checkout a new feature branch to work in
 3. Make something awesome!!
