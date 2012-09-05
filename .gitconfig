@@ -1,0 +1,83 @@
+[core]
+  #enable working directory by default
+  bare                     = false
+  #be sure to get all refs for reflog
+  logallrefupdates         = true
+  editor                   = vim
+  # personal default .gitignore
+  excludesfile             = /hom/chrismar035/.gitignore
+#defaults for any master branches
+[branch "master"]
+  remote = origin
+  merge  = refs/heads/master
+# default size of gui
+[gui]
+  geometry = 1135x731+44+44 201 168
+[alias]
+  # Single line log
+  slog    = log --oneline
+  # File names in logs
+  flog    = log --name-only --relative-date --abbrev-commit
+  # colorful log (format syntax test)
+  clog    = log --format=format:"%Cgreen%h%Creset-%C(yellow)%s%Creset%n%b"
+  # commit all modified files (doesn't do untracked)
+  acom    = commit -a
+  # stage deleted tracked files
+  df      = add -u
+  # checkout new commit
+	co      = checkout
+  # new branch
+  nb      = checkout -b
+  # short syntax for working directory status
+  s       = status -sb
+  # word-level diff (instead of line level)
+  d       = diff --word-diff
+  # super awesome colored graph log
+	lg      = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --
+  # ammend my last commit
+  fix     = "commit -a --amend -C HEAD"
+  # update feature branch from the lastest remote master
+  sync    = "!f() { echo Syncing with master && git checkout master && git pull && git checkout - && git rebase master; }; f"
+[push]
+  # push only current branch unless specified
+  default = current
+[pull]
+  # pull only current branch unless specified
+  default = current
+  # only rebase divergent remotes on pull
+  rebase = true
+# color our gits
+[color]
+  branch = auto
+  diff   = auto
+  status = auto
+[color "branch"]
+  current = yellow reverse
+  local   = yellow
+  remote  = green
+[color "diff"]
+  meta = yellow bold
+  frag = magenta bold
+  old  = red bold
+  new  = green bold
+[color "status"]
+  added     = yellow
+  changed   = green
+  untracked = cyan
+# fix my typos for me
+[help]
+  autocorrect = 1
+# me, myself
+[user]
+	name  = Chris Marshall
+	email = chris@chrismar035.com
+[github]
+  user = chrismar035
+# help me with conflicts
+[merge]
+  tool=diffmerge
+[mergetool "diffmerge"]
+	cmd = diffmerge --merge --result=$MERGED $LOCAL $BASE $REMOTE
+	trustExitCode = false
+[mergetool]
+	keepBackup = false
