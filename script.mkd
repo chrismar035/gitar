@@ -1,0 +1,359 @@
+# Gitar
+
+##Setup
+
+    $ mkdir gitar
+    $ cd gitar
+    $ git init
+
+## Committing directly into master
+
+    $ echo "Gitar - Git Workflow Lunch&Learn" > README.mkd
+    $ git status
+    $ git add README.mkd
+    $ git status
+    $ git commit
+Pause here to talk about commit messages. Show off vim
+highlighting.
+
+    $ git log
+    $ git lg
+Explain this alias and that you will share your
+.gitconfig and aliases with anyone who would like to
+see/share/steal it.
+
+## Creating a new feature
+> Story #1 - Define Guitar class
+
+    $ git co -b features/guitar_class
+    $ mkdir lib
+    $ vim lib/guitar.rb
+Shell out the Guitar class.
+
+    $ git add .
+    $ git commit
+Message: "&5BFix: #1&5D Define Guitar class"
+
+    $ git lg
+Feature is finished and we can merge back into `master`.
+
+    $ git co master
+    $ git lg
+    $ git merge features/guitar_class
+Clean up our branch.
+
+    $ git lg
+    $ git branch -d features/guitar_class
+    $ git lg
+Show that git detected that this was a fast-forward
+merge and simply applied our commit on top of `master`
+without creating a merge commit. Since this was a one
+commit feature this makes sense, as there is no
+branch history to keep.
+
+##  No fast forward merge
+> Story #2 - Add strumming methods
+
+    $ git co -b features/strum
+`co` is an alias for `checkout`
+
+    $ vim lib/guitar.rb
+> def downstrum
+>   %5B 'E', 'A', 'D', 'G', 'B', 'e' %5D.each do |string|
+>     puts string
+>   end
+> end
+
+    $ git add lib/guitar.rb
+    $ git commit
+Message: "Guitars can be down strummed"
+
+    $ vim lib/guitar.rb
+> def upstrum
+>   %5B 'e', 'B', 'G', 'D', 'A', 'E' %5D.each do |string|
+>     puts string
+>   end
+> end
+
+    $ git add lib/guitar.rb
+    $ git commit
+Message: "Guitars can be up strummed"
+
+    $ git lg
+Because the current branch has the head of the branch we
+want to merge into, git can do a fast-forward merge.
+However, if a fast forward merge involves a branch with
+more than one commit, the branch history will be lost.o
+
+    $ git checkout master
+    $ git merge features/strum
+    $ git lg
+Uh oh. The branch history is lost. We can't tell that the
+last 2 commits were part of the same story. We can't even
+put the story number in anywhere. If we needed to remove
+that feature, we could't tell from just the history.
+
+    $ git reset --keep HEAD@{1}
+    $ git lg
+No we are on master immediately before the merge.
+
+    $ git checkout features/strum
+    $ git lg
+Our branch still has the commits.
+
+    $ git checkout master
+    $ git merge --no-ff --edit features/strum
+Message body: %5BFix: #2%5D Guitars are strummable
+
+    $ git lg
+Branch history is preserved and it's easy to see who worked
+on what and how many commits where merged in with each
+feature.
+
+    $ git branch -d features/strum
+Clean up after ourselves.
+
+## Git mental model
+* singly linked list
+* commits have a link to their parent
+* commits are simply hashes of their content
+  * including the parent and message
+* links can be manipulated at will through tools like rebase
+
+## Rebasing
+> Keep your topic branches up to date
+
+### Usual use case
+
+    $ git co -b features/strums_refactor
+
+    $ vim lib/guitar.rb
+> def pick_strings(string_array)
+>   string_array.map{|s| puts s }
+> end
+> def downstrum; any_strum(%5B 'E' ... %5D)
+> def upstrum; any_strum(%5B 'e' ... %5D)
+
+    $ git gui
+Can commit the parts of the file separately.
+Message: Strum a guitar from an arbitrary note array
+Message: Guitar upstrum uses any_strum
+Message: Guitar downstrum uses any_strum
+
+    $ git lg
+
+    $ git co master
+> def strings
+>   @strings ||= %5B 'E', 'A'...'e' %5D
+> end
+Don't fix the strum methods
+
+    $ git acom
+This is an alias as well for `git commit -a`
+Message: "Add default tuning to Guitar\n\nStandard Tuning: EADGBe"
+
+    $ git co features/strums_refactor
+    $ git lg
+    $ git rebase master
+Resolve conflict: add both methods to file
+
+    $ vim lib/guitar.rb
+Use strings and strings.reverse for strum methods
+
+    $ git gui
+Add up and down strum changes separately
+
+### Interactivly rebase - augment commits
+
+#### Reorder Commits
+
+    $ git rebase -i master
+Move the lines to group up and down strum commits together
+
+    $ git lg
+See how the commits are reordered.
+
+#### Fixup
+
+    $ rebase -i master
+Combine the up and down strum commits into two respectively
+
+    $ git lg
+    $ git show <SHA1>
+The changes of the two commits are squashed into a single
+commit.
+
+#### Edit/Amend a commit
+
+    $ git rebase -i master
+Edit a commit
+
+    $ vim lib/guitar.rb
+Add STANDARD_TUNING constant
+
+    $ git status
+    $ git add lib/guitar.rb
+    $ git status
+    $ git commit --amend
+    $ git rebase --continue
+    $ git lg
+
+Merge in feature
+
+    $ git co master
+    $ git merge --no-ff --edit features/strums_refactor
+    $ git branch -d features/strums_refactor
+
+## Github interaction
+
+### Pull Request
+
+    $ git co master
+    $ git pull
+    $ git co -b features/bass
+    $ vim lib/bass.rb
+    $ git acom
+Define Bass class (no inheritence, bug for later)
+
+    $ vim lib/bass.rb
+    $ git acom
+Override strings to only include Bass strings
+
+    $ git push origin 
+Notice the lack of inheritence
+Comment by getting the link to the line and commenting
+on the pull request itself.
+
+    $ git rebase -i master
+    $ vim lib/bass.rb
+    $ git commit --amend
+    $ git rebase --continue
+
+    $ git show HEAD
+    $ git show HEAD~1
+
+    $ git push orgin fetures/bass
+!!Explosions!! If you pull here, bad things will happen.
+Look at the commits on github. Their SHA1s are different
+than the ones locally. Remember git SHA1s are based on the
+content of the commit and its parent. Therefore, if you
+change one commit. You change every commit which comes
+after it. Pulling down those commits will merge them into
+your branch, basically duplicating the commits. Instead,
+
+    $ git push -f origin features/bass
+This will force the push. Overwriting the previous commits
+with your newly rebased ones. Those commits are as good as
+gone. But the new ones are the ones we want anyway.
+
+Pull the merge request on github. Don't forget to add the
+story number into the merge commit message body.
+
+Do fixing, rebasing and merging as often as necessary to
+make sure good commits are going into master.
+
+### Rebasing master onto origin/master
+> Ninja pull
+
+    $ git co master
+    $ vim lib/bass.rb
+Add own strings array; don't rely on supering Guitar's
+
+    $ git acom
+Message: Bass doesn't rely on Guitar's standard tuning
+
+Go on Github and edit the README
+
+Bad way:
+
+    $ git pull
+Aah, merging!
+
+    $ git lg
+Ugly! We've got a merge and it's not really clear what
+happened here...
+
+    $ git reset --keep HEAD@{1}
+
+    $ git status
+Diverged
+
+    $ git rebase origin/master
+    $ git lg
+    $ git push
+
+## Git internals
+> Losing the magic.
+
+Git as a key-value store. Stored in the `.git/objects`
+directory. 
+
+    $ cd ..
+    $ mkdir internals
+    $ cd internals
+    $ git init
+    $ find .git/objects
+Directories where git data is stored.
+
+    $ find .git/objects -type f
+All data stores. Nothing yet.
+
+### `hash-object` stores data
+
+    $ echo "Save this for me, git." | git hash-object -w --stdin
+`-w` writes the object. `--stdin` specifies stdin as the
+source for the data. It prints the hash of the data, or the
+key.
+
+    $ find .git/objects -type -f
+Notice that the first two charcters of the hash are used as
+the directory and the file name is composed ofthe other 38
+charcters.
+
+### `cat-file` to read data
+
+    $ git cat-file -p <SHA1>
+
+### Writing files to the database
+
+    $ vim README.mkd
+Add some content with v1.0 in it.
+
+    $ git hash-object -w README.mkd
+    $ vim README.mkd
+Change to 2.0.
+
+    $ git hash-object -w README.mkd
+    $ find .git/objects -type f
+Check on our database. There are the three files we've
+added so far.
+
+### Loading files from the database
+
+    $ cat README.mkd
+    $ git cat-file -p <SHA1 of v1 README> > README.mkd
+    $ cat README.mkd
+    $ git cat-file -p <SHA1 of v2 README> > README.mkd
+    $ cat README.mkd
+`cat-file` into a file is almost exactly the process of
+`git checkout`. But keeping track of all these SHA1's
+for every version of every file is not very realistic.
+
+That's why git has more than one type of file which it can
+store. These file contents and raw data is called a `blob`.
+
+    $ git cat-file -t <SHA1>
+
+### Tree objects
+
+    $ cd ../gitar
+    $ git cat-file -p HEAD
+Look at the tree SHA1.
+
+    $ git cat-file -p <SHA1 of HEAD tree>
+See the contents of the root of the repo
+
+    $ git cat-file -p <SHA1 of lib dir>
+See the contents of lib/.
+
+

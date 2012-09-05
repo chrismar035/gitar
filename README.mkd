@@ -1,3 +1,158 @@
-Gitar - Git Workflow Lunch & Learn
+# Gitar - Git Workflow Lunch&Learn
 
-Now with Guitar AND Bass!!
+A 30-45 minute talk on daily Git workflow strategies and concepts.
+Topics covered will be committing, branching, merging, rebasing,
+pull requests, some nifty tricks, and git internals. A fully interactive
+"Hers's a terminal. Let's type stuff." approach will be used as opposed to a
+keynote/powerpoint style presentation. Hopefully, this will create a more
+dynamic and conversational session. Let me know if you have any specific
+questions or topics you'd like to be covered.
+
+
+## Committing
+> Get the boring stuff out of the way
+
+* good commit messages
+  * present tense - commanding the codebase to do something
+  * Pivotal Stories
+    * Fix, Deliver
+    * Pivotal Story # can be in commit message body
+  * email-like format
+    * one line subject
+    * blank line
+    * multi-line body/description
+    * 80 chars max
+    * vim setup
+* small stand-alone incremental commits
+  * `git gui`
+
+## Mental Model for Git
+* singly linked list
+* commits have a link to their parent
+* commits are simply hashes of their content
+  * including the parent and message(?)
+* links can be manipulated at will through tools like rebase
+
+## Branching
+* branches are simply pointers to a commit
+* with each commit 'into' a branch, the branch pointer moves to the new
+commit
+* `HEAD`
+  * points to the commit representing the current state of the working
+  directory
+* `git branch -b new_name`
+  * does nothing with the code
+  * simply creates a new branch pointer to the current commit (HEAD)
+* `git checkout`
+  * copies latest version of files which have modifications between the
+  current and destination
+  * fails on overwriting local changes (as they would be lost forever)
+
+## Merging
+> combining commits
+
+* fast-forward merge
+  * the first common ancestor is the current `HEAD`
+  * each commit in the source branch can be tacked onto the current branch
+  * (in actuality, the current `HEAD` is overwritten with the source branch
+  and the new commit is checked out)
+* branch merge
+  * performs a 3-way merge with your current `HEAD`, your source commit and
+  their best common ancestor
+  * basically "from this point (common ancestor), I have these changes in
+  current HEAD and I need to add these changes"
+* non-fast-forward merges create a 'merge commit'
+  * 2 parents: the previous `HEAD` and the merged branch
+  * by walking back each of the parent's history until an ancestor is found,
+  the history of the branch can be determined:
+
+## Rebasing
+> Changing the 'base' commit on which your local commits are 'based.'
+
+### Do not rebase shared commits. You can't change other's history.
+
+* rewrite history
+* managing the 'links' which make up your repo's history
+
+* Common Case - "Re-branch" my branch
+  * automatically re-checkout your branch from a source branch (typically
+  master)
+  * eliminates the race to finish a feature before master moves
+  on
+  * cleans up git history and keeps feature commits sequential
+  * `git co features/my_feature`
+    `git rebase master`
+  * great alias `sync` - auto-rebase branch from remote's master
+* Interactive Mode
+  * Reordering commits
+  * Changing commit messages
+  * Combining commits
+  * Amending commits - second chance
+* Force push
+  * *Do not pull a remote feature branch after rebasing*
+  * `git push -f origin/features/my_feature`
+  * destrictively pushes new history to github (or any remote)
+  * others who have pulled this branch will have to delete their local copies
+  forfeiting their local changes
+
+## Pull Requests
+> Get your code into master sanely
+
+New Feature workflow
+1. Get the latest master
+2. Checkout a new feature branch to work in
+3. Make something awesome!!
+4. Rebase your feature branch onto the latest master
+5. Push to github
+6. Submit pull request
+7. Pester others to review your code.
+8. Get feedback.
+9. *Through clever committing and rebasing explained above, ninja apply the
+feedback.*
+10. Repeat 4-9 until all are satisfied.
+11. Merge `--no-ff` your branch into master (or merge via github).
+12. Destroy your feature branch.
+
+## Ninja Tricks
+**Note: Many of these 'tricks' cannot be performed on pushed commits in
+master.**
+
+### Bugs?? What bugs?
+Problem: I've written a bug in my feature branch. How can I fix it before it
+goes into master?
+
+Solution: Amend your problem commit to have the correct code. Make it look
+like you never had the bug in the first place.
+
+### Lost the commit race
+Problem: Uh oh. I have some local commits in master (or releases) I'm ready to
+push, but by push got rejected as non-fast-forward.
+
+Solution: *Do not `git pull` `git push`.* `git pull` does a merge from the
+remote branch directly onto your local branch. As we know, merges create
+merge commits to track the history of the two branches being merged. We don't
+need to preserve the history of how your local master diverged temporarily
+from the remote master. So, do a `git fetch` to retrieve the remote commits
+and store them in the background. Then a `git rebase origin/master` to rebase
+your local commits onto the remote master (which you just fetched). This git
+history will be free of unnecessary merge commits and show a clean lineage.
+
+## Git Internals
+Git Objects
+
+The git database is basically a key-value store where all the keys are SHA1
+hashes of the value being stored. These key-values are called objects. The
+basic object is a blob, simply some data, like file contents. Git stores
+your files into blob objects and reads them back out again when doing
+checkouts, stashes, etc.
+
+The other type of object are tree objects. Tree objects store references to
+other blob and/or tree objects. This is very similar to a filesystem.
+
+A commit object stores a reference to a single tree object along with meta
+data about the commit; message, committer and refrence to parent commit(s).
+
+Git exposes some 'plumbing' commands to save and read blobs and trees, wire up
+commits, branches, and tags manually. The 
+[Pro Git Book Ch. 9](http://git-scm.com/book/en/Git-Internals-Git-Objects) has
+a great little exercise of doing some of these things. I highly recommend it.
