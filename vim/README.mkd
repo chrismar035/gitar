@@ -10,7 +10,7 @@ Use that as a base for your customization, but don't edit it directly.
 
 Place the customizations in your `~/.vim/after/syntax/gitcommit.vim` file. _Create one, if necessary._
 
-Mine are in this folder.
+Mine is in this folder.
 
 ## Git Inside Your Vim
 
